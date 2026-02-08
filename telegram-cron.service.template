@@ -1,0 +1,20 @@
+[Unit]
+Description=Telegram Cron Service
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=%USER%
+Group=%USER%
+WorkingDirectory=%INSTALL_DIR%
+Environment="PATH=%VENV_PATH%/bin:/usr/local/bin:/usr/bin:/bin"
+ExecStart=%VENV_PATH%/bin/python3 %INSTALL_DIR%/telegram_cron_service.py %INSTALL_DIR%/config.yaml
+Restart=always
+RestartSec=10
+StandardOutput=journal
+StandardError=journal
+SyslogIdentifier=telegram-cron
+
+[Install]
+WantedBy=default.target

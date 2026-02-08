@@ -1,0 +1,44 @@
+# Telegram Cron Service Configuration
+
+telegram:
+  # Get your bot token from @BotFather on Telegram
+  bot_token: "YOUR_BOT_TOKEN_HERE"
+  
+  # Get your chat ID by messaging @userinfobot on Telegram
+  chat_id: "YOUR_CHAT_ID_HERE"
+
+# Define your scheduled jobs
+jobs:
+  # Example: Check disk space every hour
+  disk_space_check:
+    schedule: "0 * * * *"  # Every hour at minute 0
+    script: "~/telegram-cron/scripts/check_disk_space.sh"
+    timeout: 60
+    enabled: true
+    send_errors: true
+  
+  # Example: Daily backup notification
+  daily_backup:
+    schedule: "0 2 * * *"  # Every day at 2:00 AM
+    script: "~/telegram-cron/scripts/backup_status.py"
+    timeout: 300
+    enabled: true
+    send_errors: true
+  
+  # Example: System health check every 5 minutes
+  health_check:
+    schedule: "*/5 * * * *"  # Every 5 minutes
+    script: "~/telegram-cron/scripts/health_check.py"
+    timeout: 30
+    enabled: true
+    send_errors: false
+
+# Cron schedule format: minute hour day month weekday
+# Examples:
+#   "* * * * *"       - Every minute
+#   "*/5 * * * *"     - Every 5 minutes
+#   "0 * * * *"       - Every hour
+#   "0 0 * * *"       - Every day at midnight
+#   "0 0 * * 0"       - Every Sunday at midnight
+#   "0 9 * * 1-5"     - Weekdays at 9 AM
+#   "0 0 1 * *"       - First day of every month
