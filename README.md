@@ -109,13 +109,17 @@ telegram:
 jobs:
   my_first_job:
     schedule: "*/5 * * * *"          # Every 5 minutes
-    script: "/full/path/to/telegram-cron/scripts/health_check.py"
+    script: "scripts/health_check.py"  # Relative to config file location
     timeout: 60                       # Max execution time in seconds
     enabled: true                     # Enable/disable this job
     send_errors: true                 # Send stderr even on success
 ```
 
-**Note:** Always use absolute paths for scripts in your configuration.
+**Script Paths:** You can use either relative or absolute paths:
+- **Relative paths** (recommended): `scripts/my_script.sh` - resolved from the config file directory
+- **Absolute paths**: `/home/user/telegram-cron/scripts/my_script.sh` or `~/telegram-cron/scripts/my_script.sh`
+
+**Example:** If your config file is at `/home/user/telegram-cron/config.yaml` and you specify `script: "scripts/check.sh"`, it resolves to `/home/user/telegram-cron/scripts/check.sh`
 
 ### Cron Schedule Format
 
@@ -178,7 +182,7 @@ else:
 
 ### Script Best Practices
 
-1. **Always use absolute paths** in your config (e.g., `/home/user/telegram-cron/scripts/myscript.sh`)
+1. **Use relative paths** in your config (e.g., `scripts/myscript.sh`) - they're resolved from the config file location
 2. **Make scripts executable**: `chmod +x yourscript.sh`
 3. **Use proper shebangs**:
    - Bash: `#!/bin/bash`
@@ -293,7 +297,7 @@ venv/bin/python3 telegram_cron_service.py config.yaml
 
 1. Check script permissions in your installation directory
 2. Make executable: `chmod +x scripts/*.sh scripts/*.py`
-3. Verify paths in config.yaml are absolute (not relative)
+3. Verify paths in config.yaml are correct (relative paths are resolved from config directory)
 4. Check script syntax by running manually
 
 ### Service stops after logout

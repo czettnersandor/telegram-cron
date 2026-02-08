@@ -96,10 +96,24 @@ class ScriptExecutor:
 class CronJob:
     """Represents a single cron job"""
 
-    def __init__(self, name: str, config: Dict[str, Any]):
+    def __init__(self, name: str, config: Dict[str, Any], base_dir: str = None):
         self.name = name
         self.schedule = config['schedule']
-        self.script = os.path.expanduser(config['script'])
+        script_path = config['script']
+        
+        # Resolve script path: support relative paths from config directory
+        if not os.path.isabs(script_path):
+            # If base_dir provided and path is relative, resolve from base_dir
+            if base_dir:
+                self.script = os.path.abspath(os.path.join(base_dir, script_path))
+            else:
+                self.script = os.path.abspath(script_path)
+        else:
+            # Absolute path, expand ~ if present
+            self.script = os.path.expanduser(script_path)
+        
+        logger.debug(f"Job '{name}': resolved script path '{script_path}' -> '{self.script}'")
+        
         self.timeout = config.get('timeout', 300)
         self.enabled = config.get('enabled', True)
         self.send_errors = config.get('send_errors', True)
@@ -173,6 +187,7 @@ class TelegramCronService:
 
     def __init__(self, config_path: str):
         self.config_path = config_path
+        self.config_dir = os.path.dirname(os.path.abspath(config_path))
         self.config = self.load_config()
         self.notifier = TelegramNotifier(
             self.config['telegram']['bot_token'],
@@ -209,7 +224,7 @@ class TelegramCronService:
 
         for job_name, job_config in self.config['jobs'].items():
             try:
-                jobs[job_name] = CronJob(job_name, job_config)
+                jobs[job_name] = CronJob(job_name, job_config, self.config_dir)
                 logger.info(f"Loaded job: {job_name} - Next run: {jobs[job_name].next_run}")
             except Exception as e:
                 logger.error(f"Failed to load job {job_name}: {e}")

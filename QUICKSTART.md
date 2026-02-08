@@ -84,7 +84,7 @@ Edit `config.yaml` in your installation directory:
 jobs:
   my_custom_job:
     schedule: "*/10 * * * *"  # Every 10 minutes
-    script: "/full/path/to/telegram-cron/scripts/my_script.sh"
+    script: "scripts/my_script.sh"  # Relative to config file
     timeout: 60
     enabled: true
 ```
