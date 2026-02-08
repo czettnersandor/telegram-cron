@@ -24,9 +24,9 @@ if ! command -v python3 &> /dev/null; then
     exit 1
 fi
 
-# Check if pip is installed
+# Check if pip module is available
 if ! python3 -m pip --version &> /dev/null; then
-    echo "Error: pip is not installed"
+    echo "Error: pip module is not available"
     echo "Please install pip first: sudo apt install python3-pip"
     exit 1
 fi
@@ -41,8 +41,8 @@ fi
 
 # Install/update Python dependencies
 echo "Installing/updating Python dependencies..."
-"$VENV_DIR/bin/pip" install --upgrade pip
-"$VENV_DIR/bin/pip" install -r requirements.txt
+"$VENV_DIR/bin/python3" -m pip install --upgrade pip
+"$VENV_DIR/bin/python3" -m pip install -r requirements.txt
 
 # Create scripts directory if it doesn't exist
 mkdir -p "$SCRIPTS_DIR"

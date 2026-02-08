@@ -20,12 +20,16 @@
 git clone <repository-url> ~/telegram-cron
 cd ~/telegram-cron
 
-# Run the installer
+# Run the installer (creates virtual environment and installs dependencies)
 chmod +x install.sh
 ./install.sh
 ```
 
+**Note:** The installer creates a Python virtual environment (`venv` directory) to isolate dependencies from your system Python.
+
 ### 3. Configure (1 minute)
+
+Copy some example scripts from `example-scripts/` to `scripts/`
 
 ```bash
 # Edit config in your installation directory
@@ -125,12 +129,14 @@ cd ~/telegram-cron  # or wherever you cloned it
 # Pull latest changes
 git pull
 
-# Update service and dependencies
+# Update service and dependencies (updates venv packages)
 ./install.sh
 
 # Restart service
 systemctl --user restart telegram-cron
 ```
+
+**Note:** The installer automatically updates Python packages in the virtual environment when you run it.
 
 ## Next Steps
 

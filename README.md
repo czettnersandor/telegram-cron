@@ -60,10 +60,12 @@ chmod +x install.sh
 ```
 
 The installer will:
-- Set up a Python virtual environment in the current directory
-- Install all dependencies
+- Set up a Python virtual environment in the current directory (isolated from system Python)
+- Install all dependencies within the virtual environment using `python3 -m pip`
 - Configure the systemd service with the current installation path
 - Create a default config.yaml if it doesn't exist
+
+**Note:** This installation uses Python virtual environments to isolate dependencies from your system Python installation. All packages are installed within the project's `venv` directory.
 
 ### Manual Installation
 
@@ -78,8 +80,9 @@ cd ~/telegram-cron
 python3 -m venv venv
 source venv/bin/activate
 
-# Install dependencies
-pip install -r requirements.txt
+# Install dependencies (using python3 -m pip ensures virtual environment isolation)
+python3 -m pip install --upgrade pip
+python3 -m pip install -r requirements.txt
 
 # Create configuration
 cp config.example.yaml config.yaml
@@ -185,6 +188,14 @@ else:
 6. **Return "NOUPDATE"** when everything is fine to reduce noise
 7. **Use git to update** - Pull latest changes with `git pull` and run `./install.sh` to update the service
 
+### Example AI prompt to create a script
+
+This software was designed with AI in mind. You should be able to ask your preferred AI assistant to create a script for you. Because asking the AI from a chat is cheaper (usually free) than asking it from an IDE. Here's an example prompt:
+
+"Create a Python script that checks the CPU usage and prints a message if it exceeds 80%. If it's below 80%, return 'NOUPDATE'."
+
+Then, you can copy this script to your `scripts` directory and add it to your config. Simple as that!
+
 ## Running the Service
 
 ### Start the Service
@@ -238,8 +249,9 @@ curl "https://api.telegram.org/bot<YOUR_BOT_TOKEN>/getMe"
 ```bash
 # Change to your installation directory
 cd ~/telegram-cron  # or wherever you cloned it
-source venv/bin/activate
-python3 scripts/health_check.py
+
+# Or run directly with venv python without activating
+venv/bin/python3 scripts/health_check.py
 ```
 
 ### Test Configuration
@@ -247,10 +259,12 @@ python3 scripts/health_check.py
 ```bash
 # Change to your installation directory
 cd ~/telegram-cron  # or wherever you cloned it
-source venv/bin/activate
-python3 telegram_cron_service.py config.yaml
-# Press Ctrl+C to stop
+
+# Or run directly with venv python without activating
+venv/bin/python3 telegram_cron_service.py config.yaml
 ```
+
+**Note:** All commands use the virtual environment's Python interpreter to ensure proper dependency isolation.
 
 ## Troubleshooting
 
@@ -368,10 +382,24 @@ rm -rf ~/telegram-cron
 
 ## Dependencies
 
+This project uses Python virtual environments to isolate dependencies from your system Python installation.
+
+### Core Dependencies
+
 - `requests` - HTTP library for Telegram API
 - `PyYAML` - YAML configuration parsing
 - `croniter` - Cron expression parsing
 - `psutil` - System monitoring (for example scripts)
+
+### Virtual Environment
+
+All dependencies are installed in a local `venv` directory within your installation. This ensures:
+- No conflicts with system Python packages
+- Easy cleanup (just delete the `venv` directory)
+- Reproducible installations
+- No need for sudo/root access
+
+The installation script uses `python3 -m pip` to ensure proper isolation and that all packages are installed in the virtual environment, not system-wide.
 
 ## License
 
