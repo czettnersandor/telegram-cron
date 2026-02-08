@@ -17,7 +17,7 @@
 
 ```bash
 # Clone to your preferred location
-git clone <repository-url> ~/telegram-cron
+git clone https://github.com/czettnersandor/telegram-cron.git ~/telegram-cron
 cd ~/telegram-cron
 
 # Run the installer (creates virtual environment and installs dependencies)

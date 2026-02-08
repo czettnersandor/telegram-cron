@@ -5,8 +5,6 @@ Wants=network-online.target
 
 [Service]
 Type=simple
-User=%USER%
-Group=%USER%
 WorkingDirectory=%INSTALL_DIR%
 Environment="PATH=%VENV_PATH%/bin:/usr/local/bin:/usr/bin:/bin"
 ExecStart=%VENV_PATH%/bin/python3 %INSTALL_DIR%/telegram_cron_service.py %INSTALL_DIR%/config.yaml
