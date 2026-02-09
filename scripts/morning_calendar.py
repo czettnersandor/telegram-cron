@@ -8,9 +8,6 @@ import urllib.request
 from datetime import datetime, date
 import sys
 
-# Configuration
-ICAL_URL = "https://example.com/calendar.ics"  # Replace with your calendar URL
-
 def fetch_ical(url):
     """Fetch iCal content from URL"""
     try:
@@ -97,8 +94,14 @@ def get_todays_events(events):
     return todays_events
 
 def main():
+    if len(sys.argv) < 2:
+        print("Error: No iCal URL provided", file=sys.stderr)
+        sys.exit(1)
+
+    ical_url = sys.argv[1]
+
     # Fetch and parse calendar
-    ical_content = fetch_ical(ICAL_URL)
+    ical_content = fetch_ical(ical_url)
     events = parse_events(ical_content)
     todays_events = get_todays_events(events)
 
@@ -113,7 +116,7 @@ def main():
 
     print(f"Good morning Sandor!")
     print()
-    print(f"Today's Schedule — {day_name}, {month_day}:")
+    print(f"📅Today's Schedule — {day_name}, {month_day}:")
     print()
 
     # Print events

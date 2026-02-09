@@ -28,6 +28,8 @@ jobs:
     timeout: 300
     enabled: true
     send_errors: true
+    args:
+      - "/export/storage/rsnapshot/daily.0/mywebsite/var/www/html/mywebsite/shared"
 
   # Example: System health check every 5 minutes
   health_check:

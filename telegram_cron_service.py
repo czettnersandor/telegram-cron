@@ -57,13 +57,14 @@ class ScriptExecutor:
     """Executes scripts and handles their output"""
 
     @staticmethod
-    def execute(script_path: str, timeout: int = 300) -> tuple[int, str, str]:
+    def execute(script_path: str, timeout: int = 300, args: list = None) -> tuple[int, str, str]:
         """
         Execute a script and return exit code, stdout, stderr
 
         Args:
             script_path: Path to the script to execute
             timeout: Maximum execution time in seconds
+            args: Additional arguments to pass to the script
 
         Returns:
             Tuple of (exit_code, stdout, stderr)
@@ -74,6 +75,10 @@ class ScriptExecutor:
                 cmd = [sys.executable, script_path]
             else:
                 cmd = ['/bin/bash', script_path]
+            
+            # Add arguments if provided
+            if args:
+                cmd.extend(args)
 
             result = subprocess.run(
                 cmd,
@@ -100,7 +105,7 @@ class CronJob:
         self.name = name
         self.schedule = config['schedule']
         script_path = config['script']
-        
+
         # Resolve script path: support relative paths from config directory
         if not os.path.isabs(script_path):
             # If base_dir provided and path is relative, resolve from base_dir
@@ -111,12 +116,13 @@ class CronJob:
         else:
             # Absolute path, expand ~ if present
             self.script = os.path.expanduser(script_path)
-        
+
         logger.debug(f"Job '{name}': resolved script path '{script_path}' -> '{self.script}'")
-        
+
         self.timeout = config.get('timeout', 300)
         self.enabled = config.get('enabled', True)
         self.send_errors = config.get('send_errors', True)
+        self.args = config.get('args', [])
 
         # Validate cron expression
         try:
@@ -154,20 +160,17 @@ class CronJob:
         self.last_run = datetime.now()
 
         executor = ScriptExecutor()
-        exit_code, stdout, stderr = executor.execute(self.script, self.timeout)
+        exit_code, stdout, stderr = executor.execute(self.script, self.timeout, self.args)
 
         # Check for NOUPDATE flag
         if stdout.strip() == "NOUPDATE":
             logger.info(f"Job {self.name} returned NOUPDATE - no message sent")
         else:
             # Prepare message
-            status = "✅ Success" if exit_code == 0 else "❌ Failed"
-            message = f"<b>{status}: {self.name}</b>\n"
-            message += f"<b>Time:</b> {self.last_run.strftime('%Y-%m-%d %H:%M:%S')}\n"
-            message += f"<b>Script:</b> {self.script}\n\n"
+            message = f"<b>{self.name}</b>\n"
 
             if stdout:
-                message += f"<b>Output:</b>\n<pre>{stdout[:3000]}</pre>\n"
+                message += f"\n{stdout[:3000]}\n"
 
             if stderr and (exit_code != 0 or self.send_errors):
                 message += f"<b>Errors:</b>\n<pre>{stderr[:1000]}</pre>\n"
